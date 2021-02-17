@@ -263,15 +263,27 @@ void QVTKOpenGLWindow::paintGL()
     if (fmt.stereo() && this->RenderWindow->GetStereoRender() &&
       this->RenderWindow->GetStereoType() == VTK_STEREO_CRYSTAL_EYES)
     {
+#if defined(GL_ES_VERSION_3_0)
+      this->RenderWindowAdapter->blitLeftEye(
+        this->defaultFramebufferObject(), GL_COLOR_ATTACHMENT0, QRect(QPoint(0, 0), deviceSize));
+      this->RenderWindowAdapter->blitRightEye(
+        this->defaultFramebufferObject(), GL_COLOR_ATTACHMENT1, QRect(QPoint(0, 0), deviceSize));
+#else
       this->RenderWindowAdapter->blitLeftEye(
         this->defaultFramebufferObject(), GL_BACK_LEFT, QRect(QPoint(0, 0), deviceSize));
       this->RenderWindowAdapter->blitRightEye(
         this->defaultFramebufferObject(), GL_BACK_RIGHT, QRect(QPoint(0, 0), deviceSize));
+#endif
     }
     else
     {
+#if defined(GL_ES_VERSION_3_0)
+      this->RenderWindowAdapter->blit(
+        this->defaultFramebufferObject(), GL_COLOR_ATTACHMENT0, QRect(QPoint(0, 0), deviceSize));
+#else
       this->RenderWindowAdapter->blit(
         this->defaultFramebufferObject(), GL_BACK_LEFT, QRect(QPoint(0, 0), deviceSize));
+#endif
     }
     ostate->Pop();
   }
